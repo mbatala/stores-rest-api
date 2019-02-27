@@ -1,6 +1,6 @@
 import sqlite3
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required
+from flask_jwt_extended import jwt_required
 from models.item import ItemModel
 
 class Item(Resource):
@@ -16,7 +16,7 @@ class Item(Resource):
         help = "Every item needs a store id."
     )
 
-    @jwt_required()
+    @jwt_required
     def get(self, name):
         item = ItemModel.find_by_name(name)
         if item:
@@ -24,7 +24,7 @@ class Item(Resource):
         return {'message': "Item with name '{}' not found!".format(name)}, 404
 
 
-    @jwt_required()
+    @jwt_required
     def post(self, name):
         if ItemModel.find_by_name(name):
             return {'message': "An item with name '{}' already exists.".format(name)}, 400 # Bad request status code
@@ -42,7 +42,7 @@ class Item(Resource):
         return item.json(), 201 # http status code for successful creating an item
 
 
-    @jwt_required()
+    @jwt_required
     def delete(self, name):
         item = ItemModel.find_by_name(name)
         if item:
@@ -50,7 +50,7 @@ class Item(Resource):
             return {"message": "An item with name '{}' deleted".format(name)}, 200
         return {'message': "An item with name '{}' doesn't exist.".format(name)}, 400
 
-    @jwt_required()
+    @jwt_required
     def put(self, name):
         data = Item.parser.parse_args()
 
@@ -68,7 +68,7 @@ class Item(Resource):
 
 
 class ItemList(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         return {'items': [item.json() for item in ItemModel.find_all()]}, 200
         #return {'items': list(map(lambda x: x.json(), ItemModel.query.all()))}
